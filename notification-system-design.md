@@ -37,12 +37,12 @@ The notification platform needs to let a student see their notifications when th
 
 **Endpoints:**
 
-1. `GET /api/v1/notifications` – get list of notifications (supports filters like isRead, page, limit)
-2. `GET /api/v1/notifications/{id}` – get one notification
-3. `POST /api/v1/notifications` – create a notification
-4. `PATCH /api/v1/notifications/{id}/read` – mark one notification as read
-5. `DELETE /api/v1/notifications/{id}` – delete a notification
-6. `GET /api/v1/notifications/unread-count` – get unread count
+1. `GET  – get list of notifications (supports filters like isRead, page, limit)
+2. `GET  – get one notification
+3. `POST  – create a notification
+4. `PATCH  – mark one notification as read
+5. `DELETE  – delete a notification
+6. `GET  – get unread count
 
 Example response for creating a notification:
 ```json
