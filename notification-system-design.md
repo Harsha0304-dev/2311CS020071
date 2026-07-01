@@ -204,14 +204,7 @@ Start with pagination + caching + storing unread count separately, since these a
 
 ## Stage 5: Improving the "Notify All" Function
 
-Given pseudocode:
 
-function notify_all(student_ids: array, message: string):
-    for student_id in student_ids:
-        send_email(student_id, message)
-        send_sms(student_id, message)
-        save_to_db(student_id, message)
-        push_to_app(student_id, message)
 
 Shortcomings of this implementation:
 
