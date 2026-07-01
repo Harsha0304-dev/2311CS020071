@@ -201,3 +201,39 @@ Every time a student opens a page, the app fetches notifications from the databa
 
 **Best approach:**
 Start with pagination + caching + storing unread count separately, since these are simple and give good results. If needed later, add real-time updates using WebSockets for a better user experience.
+
+Stage 5: Improving the "Notify All" Function
+
+Given pseudocode:
+
+function notify_all(student_ids: array, message: string):
+    for student_id in student_ids:
+        send_email(student_id, message)
+        send_sms(student_id, message)
+        save_to_db(student_id, message)
+        push_to_app(student_id, message)
+
+Shortcomings of this implementation:
+
+
+It sends everything one student at a time (sequential), so it will be very slow for 50,000 students.
+There is no error handling. If one step fails, we don't know what happens to the rest.
+If it fails partway, we don't know which students already got notified and which didn't.
+It mixes fast operations (DB save) with slow operations (email, SMS, push) in the same flow, so one slow service blocks everything.
+No retry mechanism if sending fails.
+No logging of failures, so it's hard to debug later.
+
+
+If send_email fails for 200 students midway, what happens?
+Since there's no error handling, the function likely stops or skips ahead without saving which students failed. We lose track of who was notified and who wasn't. Some students may have gotten the DB entry and push notification but not the email, causing an inconsistent state. There is also no automatic way to retry only for those 200 students.
+
+Would I redesign this? Yes.
+
+New approach:
+
+
+First, save the notification to the database for all students (this is fast and reliable).
+Then, instead of sending emails/SMS/push directly in the same request, add each delivery task to a queue (like RabbitMQ, SQS, or a simple background job).
+A separate worker process picks tasks from the queue and sends email/SMS/push independently.
+If sending fails for a student, log it and retry later (with a limit, like 3 retries), instead of blocking the whole process.
+Track delivery status per student (PENDING, DELIVERED, FAILED) so we always know what happened.
